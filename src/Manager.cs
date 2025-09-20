@@ -10,7 +10,12 @@ class Program {
     }
 }
 
-class Manager : App {
+public class Manager : App {
+
+    private ArrowGame? game;
+
+    private readonly Batcher batcher;
+
     public Manager() : base(new AppConfig() {
         ApplicationName = "Arrow Olympics",
         WindowTitle = "Arrow Olympics",
@@ -18,11 +23,7 @@ class Manager : App {
         Height = 720,
         Resizable = true
     }) {
-
-    }
-
-    protected override void Render() {
-        // throw new NotImplementedException();
+        batcher = new(GraphicsDevice);
     }
 
     protected override void Shutdown() {
@@ -31,9 +32,31 @@ class Manager : App {
 
     protected override void Startup() {
         // throw new NotImplementedException();
+
+        game = new ArrowGame(this);
+
     }
 
     protected override void Update() {
-        // throw new NotImplementedException();
+        if (Input.Keyboard.Pressed(Keys.Escape)) {
+            Exit();
+        }
+
+        // Reset
+        if (Input.Keyboard.Pressed(Keys.F1) && game == null) {
+            Startup();
+            return;
+        }
+
+        game?.Update();
+    }
+
+    protected override void Render() {
+        // draw the main UI first
+        Window.Clear(0x2e1426);
+        batcher.Render(Window);
+
+        // draw game on top if it exists
+        game?.Render(Window.BoundsInPixels());
     }
 }
