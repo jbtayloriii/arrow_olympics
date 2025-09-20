@@ -6,17 +6,30 @@ namespace arrow_olympics;
 
 public class Shooter : Actor {
 
-    public const int HEIGHT = 6;
+    public const int HEIGHT = 7;
     public const int WIDTH = 24;
 
     private const int ACCEL = 350;
     private const int MAX_SPEED = 88;
     private const int FRICTION = 75;
 
+    private const int ARROW_COOLDOWN = 1;
+
+    private readonly bool facingRight;
+
+    private Point2 ArrowOffset => new(facingRight ? WIDTH : -8, HEIGHT / 2);
+
+    // Add arrow width if facing right; hitbox is on right side
+    private Point2 ArrowPosition => Position + ArrowOffset + (facingRight ? new(8, 0) : Point2.Zero);
+
+    // mutable state
     private int moveVal = 0;
 
-    public Shooter(Point2 startingPoint) {
+    private float arrowTimer = 0;
+
+    public Shooter(Point2 startingPoint, bool facingRight = true) {
         this.Position = startingPoint;
+        this.facingRight = facingRight;
     }
 
     public override void Render(Batcher batcher) {
@@ -24,11 +37,18 @@ public class Shooter : Actor {
         Rect currentRect = new(0, 0, WIDTH, HEIGHT);
         batcher.Rect(currentRect, Color.Green);
 
-        // todo: draw arrow
+        if (arrowTimer <= 0) {
+            batcher.Rect(new(ArrowOffset, 8, 1), Color.LightGray);
+        }
     }
 
     public void TryShoot() {
-        // todo: implement
+        if (arrowTimer > 0) {
+            return;
+        }
+
+        arrowTimer = ARROW_COOLDOWN;
+        Game.Create<Arrow>(ArrowPosition);
     }
 
     public void SetMove(int moveVal) {
@@ -38,13 +58,9 @@ public class Shooter : Actor {
     public override void Update() {
         base.Update();
 
-
-
-        // if (MathF.Abs(Velocity.X) > maxspd)
-        //     Velocity.X = Calc.Approach(Velocity.X, MathF.Sign(Velocity.X) * maxspd, 2000 * Time.Delta);
-        // if (moveVal != 0) {
-        //     Console.WriteLine("Moving player controller");
-        //     Console.WriteLine($"Direction value: {moveVal}");
+        if (arrowTimer > 0) {
+            arrowTimer -= Time.Delta;
+        }
 
         // speed
         Velocity.Y += this.moveVal * Time.Delta * ACCEL;

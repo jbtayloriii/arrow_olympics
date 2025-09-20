@@ -4,8 +4,8 @@ using System.Numerics;
 namespace arrow_olympics;
 
 public class ArrowGame {
-    private const int WIDTH = 384;
-    private const int HEIGHT = 216;
+    public const int WIDTH = 384;
+    public const int HEIGHT = 216;
 
     public const int ARENA_TOP = 8;
     public const int ARENA_BOTTOM = 160;
@@ -16,6 +16,7 @@ public class ArrowGame {
     private readonly Target screen;
     private readonly Batcher batcher;
 
+    private readonly List<Actor> destroying = [];
     public List<Actor> Actors = [];
 
     private List<ShooterController> controllers = [];
@@ -38,7 +39,7 @@ public class ArrowGame {
         controllers.Clear();
 
         leftShooter = new(new(0, HEIGHT / 2));
-        rightShooter = new(new(WIDTH - Shooter.WIDTH, HEIGHT / 2));
+        rightShooter = new(new(WIDTH - Shooter.WIDTH, HEIGHT / 2), facingRight: false);
         leftShooter.Game = this;
         rightShooter.Game = this;
 
@@ -47,6 +48,11 @@ public class ArrowGame {
         var leftController = new PlayerController(leftShooter, this.Controls);
         var rightController = new ComputerController(rightShooter);
         controllers.AddRange([leftController, rightController]);
+    }
+
+    public void Destroy(Actor actor) {
+        if (!destroying.Contains(actor))
+            destroying.Add(actor);
     }
 
     public T Create<T>(Point2? position = null) where T : Actor, new() {
@@ -63,6 +69,13 @@ public class ArrowGame {
         foreach (ShooterController controller in controllers) {
             controller.Update(this);
         }
+
+        // Remove Destroyed Actors
+        for (int i = 0; i < destroying.Count; i++) {
+            destroying[i].Destroyed();
+            Actors.Remove(destroying[i]);
+        }
+        destroying.Clear();
 
         // Update Actors
         for (int i = 0; i < Actors.Count; i++)
