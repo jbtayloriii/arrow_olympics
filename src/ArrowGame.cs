@@ -1,14 +1,19 @@
 using Foster.Framework;
 using System.Numerics;
-using System.Runtime.InteropServices.Swift;
 
 namespace arrow_olympics;
+
+public enum Player {
+    NoPlayer,
+    LeftPlayer,
+    RightPlayer,
+}
 
 public class ArrowGame {
     public const int WIDTH = 384;
     public const int HEIGHT = 216;
 
-    public const int ARENA_TOP = 8;
+    public const int ARENA_TOP = 24;
     public const int ARENA_BOTTOM = 160;
 
     // Area where the boxes will float
@@ -47,8 +52,8 @@ public class ArrowGame {
         Actors.Clear();
         controllers.Clear();
 
-        leftShooter = new(new(0, HEIGHT / 2));
-        rightShooter = new(new(WIDTH - Shooter.WIDTH, HEIGHT / 2), facingRight: false);
+        leftShooter = new(new(0, HEIGHT / 2), player: Player.LeftPlayer);
+        rightShooter = new(new(WIDTH - Shooter.WIDTH, HEIGHT / 2), player: Player.RightPlayer);
         leftShooter.Game = this;
         rightShooter.Game = this;
 

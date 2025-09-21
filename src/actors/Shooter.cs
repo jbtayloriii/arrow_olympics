@@ -15,21 +15,21 @@ public class Shooter : Actor {
 
     private const int ARROW_COOLDOWN = 1;
 
-    private readonly bool facingRight;
+    private readonly Player player;
 
-    private Point2 ArrowOffset => new(facingRight ? WIDTH : -8, HEIGHT / 2);
+    private Point2 ArrowOffset => new(player == Player.LeftPlayer ? WIDTH : -8, HEIGHT / 2);
 
-    // Add arrow width if facing right; hitbox is on right side
-    private Point2 ArrowPosition => Position + ArrowOffset + (facingRight ? new(8, 0) : Point2.Zero);
+    // Add arrow width if left player; hitbox is on right side at end of arrow width
+    private Point2 ArrowPosition => Position + ArrowOffset + (player == Player.LeftPlayer ? new(8, 0) : Point2.Zero);
 
     // mutable state
     private int moveVal = 0;
 
     private float arrowTimer = 0;
 
-    public Shooter(Point2 startingPoint, bool facingRight = true) {
+    public Shooter(Point2 startingPoint, Player player) {
         this.Position = startingPoint;
-        this.facingRight = facingRight;
+        this.player = player;
     }
 
     public override void Render(Batcher batcher) {
@@ -49,7 +49,7 @@ public class Shooter : Actor {
 
         arrowTimer = ARROW_COOLDOWN;
         var arrow = Game.Create<Arrow>(ArrowPosition);
-        arrow.Init(facingRight);
+        arrow.Init(player);
     }
 
     public void SetMove(int moveVal) {
