@@ -7,11 +7,7 @@ public class Actor {
     [Flags]
     public enum Masks {
         None = 0,
-        Solid = 1 << 0,
-        Player = 1 << 1,
-        Enemy = 1 << 2,
-        PlayerBullet = 1 << 3,
-        EnemyBullet = 1 << 4,
+        Box = 1 << 0,
     }
 
     public ArrowGame Game = null!;
@@ -206,13 +202,13 @@ public class Actor {
         sign.X = Math.Sign(sign.X);
         sign.Y = Math.Sign(sign.Y);
 
-        if (CollidesWithSolids) {
-            if (OverlapsAny(sign, Masks.Solid))
-                return false;
+        // if (CollidesWithSolids) {
+        //     if (OverlapsAny(sign, Masks.Solid))
+        //         return false;
 
-            // if (sign.Y > 0 && Grounded())
-            //     return false;
-        }
+        //     // if (sign.Y > 0 && Grounded())
+        //     //     return false;
+        // }
 
         Position += sign;
         return true;

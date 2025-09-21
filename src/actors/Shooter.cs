@@ -48,7 +48,8 @@ public class Shooter : Actor {
         }
 
         arrowTimer = ARROW_COOLDOWN;
-        Game.Create<Arrow>(ArrowPosition);
+        var arrow = Game.Create<Arrow>(ArrowPosition);
+        arrow.Init(facingRight);
     }
 
     public void SetMove(int moveVal) {

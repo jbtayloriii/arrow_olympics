@@ -1,5 +1,6 @@
 using Foster.Framework;
 using System.Numerics;
+using System.Runtime.InteropServices.Swift;
 
 namespace arrow_olympics;
 
@@ -10,11 +11,19 @@ public class ArrowGame {
     public const int ARENA_TOP = 8;
     public const int ARENA_BOTTOM = 160;
 
+    // Area where the boxes will float
+    public const int BOX_SPACING = 28;
+    private const int BOX_AREA_WIDTH = Box.WIDTH * 7 + BOX_SPACING * 6;
+    private const int BOX_AREA_HEIGHT = 160;
+    public static Point2 BoxAreaStartPoint => new((WIDTH - BOX_AREA_WIDTH) / 2, (HEIGHT - BOX_AREA_HEIGHT) / 2);
+    public static RectInt BoxArea => new(BoxAreaStartPoint, BOX_AREA_WIDTH, BOX_AREA_HEIGHT);
+
     public readonly Manager Manager;
 
     public readonly Controls Controls;
     private readonly Target screen;
     private readonly Batcher batcher;
+    private BoxHandler? boxHandler = null;
 
     private readonly List<Actor> destroying = [];
     public List<Actor> Actors = [];
@@ -46,8 +55,14 @@ public class ArrowGame {
         Actors.AddRange([leftShooter, rightShooter]);
 
         var leftController = new PlayerController(leftShooter, this.Controls);
-        var rightController = new ComputerController(rightShooter);
+
+        // TODO: swap back out for computer controller
+        var rightController = new PlayerController(rightShooter, this.Controls);
+        // var rightController = new ComputerController(rightShooter);
+
         controllers.AddRange([leftController, rightController]);
+
+        this.boxHandler = new(new VaryingSinePattern(), this);
     }
 
     public void Destroy(Actor actor) {
@@ -80,6 +95,9 @@ public class ArrowGame {
         // Update Actors
         for (int i = 0; i < Actors.Count; i++)
             Actors[i].Update();
+
+        // Update boxhandler after actors to set "next" box position, to keep consistent with other actors' behavior
+        boxHandler?.Update();
     }
 
     public void Render(in RectInt viewport) {
@@ -103,9 +121,10 @@ public class ArrowGame {
         }
         rendering.Clear();
 
-        // Draw some debug borders around arena
+        // Draw some debug borders where shooters are limited from going
         batcher.Rect(new(0, 0, WIDTH, ARENA_TOP), Color.FromHexStringRGB("505050"));
-        batcher.Rect(new(0, ARENA_BOTTOM, WIDTH, HEIGHT - ARENA_BOTTOM), Color.FromHexStringRGB("505050"));
+        batcher.Rect(new(0, ARENA_BOTTOM, Shooter.WIDTH, HEIGHT - ARENA_BOTTOM), Color.FromHexStringRGB("505050"));
+        batcher.Rect(new(WIDTH - Shooter.WIDTH, ARENA_BOTTOM, Shooter.WIDTH, HEIGHT - ARENA_BOTTOM), Color.FromHexStringRGB("505050"));
 
         // Render contents to screen
         batcher.Render(screen);
