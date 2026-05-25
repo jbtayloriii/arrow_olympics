@@ -15,12 +15,12 @@ public class Shooter : Actor {
 
     private const int ARROW_COOLDOWN = 1;
 
-    private readonly Player player;
+    public readonly Player player;
 
     private Point2 ArrowOffset => new(player == Player.LeftPlayer ? WIDTH : -8, HEIGHT / 2);
 
     // Add arrow width if left player; hitbox is on right side at end of arrow width
-    private Point2 ArrowPosition => Position + ArrowOffset + (player == Player.LeftPlayer ? new(8, 0) : Point2.Zero);
+    public Point2 ArrowPosition => Position + ArrowOffset + (player == Player.LeftPlayer ? new(8, 0) : Point2.Zero);
 
     // mutable state
     private int moveVal = 0;

@@ -11,7 +11,7 @@ public class Arrow : Actor {
     public static readonly Color ARROW_COLOR = Color.Gray;
     public static readonly Color ARROW_TIP_COLOR = Color.LightGray;
 
-    private const int SPEED = 400;
+    public const int SPEED = 400;
 
     public Player player = Player.NoPlayer;
 

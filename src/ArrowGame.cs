@@ -20,6 +20,8 @@ public class ArrowGame {
     public const int BOX_SPACING = 28;
     private const int BOX_AREA_WIDTH = Box.WIDTH * 7 + BOX_SPACING * 6;
     private const int BOX_AREA_HEIGHT = 160;
+
+    public double UpdateRatePerSecond => Manager.UpdateMode.FixedTargetTime.TotalSeconds;
     public static Point2 BoxAreaStartPoint => new((WIDTH - BOX_AREA_WIDTH) / 2, (HEIGHT - BOX_AREA_HEIGHT) / 2);
     public static RectInt BoxArea => new(BoxAreaStartPoint, BOX_AREA_WIDTH, BOX_AREA_HEIGHT);
 
@@ -28,7 +30,7 @@ public class ArrowGame {
     public readonly Controls Controls;
     private readonly Target screen;
     private readonly Batcher batcher;
-    private BoxHandler? boxHandler = null;
+    private BoxesHandler? boxHandler = null;
 
     private readonly List<Actor> destroying = [];
     public List<Actor> Actors = [];

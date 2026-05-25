@@ -13,7 +13,7 @@ public class VaryingSinePattern : BoxPattern {
         return DURATION;
     }
 
-    public float GetPositionAtTime(int boxPos, float time) {
+    public float GetVerticalPosPercent(int boxPos, float time) {
         float timeDelta = time + boxPos * VARYING_AMT;
         return (float)((Math.Sin(timeDelta * PATTERN_SPEED) + 1) / 2);
     }

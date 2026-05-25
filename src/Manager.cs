@@ -21,7 +21,8 @@ public class Manager : App {
         WindowTitle = "Arrow Olympics",
         Width = 1280,
         Height = 720,
-        Resizable = true
+        Resizable = true,
+        UpdateMode = UpdateMode.FixedStep(60),
     }) {
         batcher = new(GraphicsDevice);
     }

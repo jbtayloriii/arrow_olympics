@@ -3,39 +3,47 @@ using Foster.Framework;
 
 namespace arrow_olympics;
 
-public class BoxHandler {
+public class BoxesHandler {
 
-    private const int BOX_COUNT = 7;
+    public const int BOX_COUNT = 7;
     private const float BOX_RESPAWN_TIME = 1f;
 
-    private readonly Box?[] boxes = new Box[BOX_COUNT];
+    public readonly Box?[] boxes = new Box[BOX_COUNT];
 
     private readonly ArrowGame game;
     private readonly BoxPattern pattern;
 
     private float boxTime = 0;
 
-    private readonly int[] boxXPositions = new int[BOX_COUNT];
-    private float[] boxRespawnTimers = new float[BOX_COUNT] { 0, 0, 0, 0, 0, 0, 0 };
+    public readonly int[] boxXPositions = [.. from i in Enumerable.Range(0, BOX_COUNT) select (ArrowGame.BOX_SPACING + Box.WIDTH) * i];
+    private readonly float[] boxRespawnTimers = [.. from _ in Enumerable.Range(0, BOX_COUNT) select 0f];
+
+
+    // Tracks boxes captured by players
+    // I could use ints with bitmasking to be more efficient, but whatever
+    private bool[] leftPlayerBoxes = [.. from _ in Enumerable.Range(0, BOX_COUNT) select false];
+    public bool[] LeftPlayerBoxes => leftPlayerBoxes;
+    private bool[] rightPlayerBoxes = [.. from _ in Enumerable.Range(0, BOX_COUNT) select false];
+    public bool[] RightPlayerBoxes => rightPlayerBoxes;
 
 
 
-    public BoxHandler(BoxPattern pattern, ArrowGame game) {
+    public BoxesHandler(BoxPattern pattern, ArrowGame game) {
         this.game = game;
         this.pattern = pattern;
-
-        // Cache box X positions for respawning
-        for (int i = 0; i < BOX_COUNT; i++) {
-            this.boxXPositions[i] = (ArrowGame.BOX_SPACING + Box.WIDTH) * i;
-        }
 
         // Initialize boxes
         for (int i = 0; i < BOX_COUNT; i++) {
             Point2 position = ArrowGame.BoxAreaStartPoint + new Point2(boxXPositions[i], 0);
 
             var box = game.Create<Box>(position);
+            box.boxId = i;
             boxes[i] = box;
         }
+    }
+
+    public Player GetWinningPlayer() {
+        return Player.NoPlayer;
     }
 
 
@@ -51,16 +59,12 @@ public class BoxHandler {
                 continue;
             }
 
-            Console.WriteLine($"Depleting box respawn at position {i}");
             boxRespawnTimers[i] -= game.Time.Delta;
             if (boxRespawnTimers[i] <= 0) {
                 Point2 position = ArrowGame.BoxAreaStartPoint + new Point2(boxXPositions[i], 0);
 
-
-
                 var box = game.Create<Box>(position);
                 boxes[i] = box;
-                Console.WriteLine($"Respawning box at position {i}");
             }
         }
 
@@ -74,12 +78,15 @@ public class BoxHandler {
                 game.Destroy(box);
                 boxes[i] = null;
                 boxRespawnTimers[i] = BOX_RESPAWN_TIME;
-                Console.WriteLine($"box claim: {box.ClaimedByPlayer}");
-                Console.WriteLine($"Set respawn timer for {i} to {boxRespawnTimers[i]}");
+                if (box.ClaimedByPlayer == Player.LeftPlayer) {
+                    leftPlayerBoxes[i] = true;
+                } else {
+                    rightPlayerBoxes[i] = true;
+                }
                 continue;
             }
 
-            float boxPercent = pattern.GetPositionAtTime(i, boxTime);
+            float boxPercent = pattern.GetVerticalPosPercent(i, boxTime);
 
             int boxHeight = (int)(ArrowGame.BoxArea.Height * boxPercent);
 

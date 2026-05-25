@@ -7,7 +7,7 @@ public class SinePattern : BoxPattern {
         return DURATION;
     }
 
-    public float GetPositionAtTime(int boxPos, float time) {
+    public float GetVerticalPosPercent(int boxPos, float time) {
         return (float)((Math.Sin(time) + 1) / 2);
     }
 }
