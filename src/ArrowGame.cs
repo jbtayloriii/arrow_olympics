@@ -69,7 +69,7 @@ public class ArrowGame {
 
         controllers.AddRange([leftController, rightController]);
 
-        this.boxHandler = new(new VaryingSinePattern(), this);
+        this.boxHandler = new(this);
     }
 
     public void Destroy(Actor actor) {
@@ -82,7 +82,11 @@ public class ArrowGame {
             Game = this,
             Position = position ?? Point2.Zero,
         };
-        instance.Added();
+        Actors.Add(instance);
+        return instance;
+    }
+
+    public Actor Register(Actor instance) {
         Actors.Add(instance);
         return instance;
     }

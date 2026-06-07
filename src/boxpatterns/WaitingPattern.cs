@@ -1,18 +1,29 @@
 namespace arrow_olympics;
 
-public class WaitingPattern {
+/// <summary>
+/// Box pattern that waits a set amount of time before delegating to another pattern.
+/// </summary>
+public class WaitingPattern : BoxPattern {
+    private float waitTime;
 
     private readonly BoxPattern delegatePattern;
 
-    public WaitingPattern(BoxPattern del) {
+    public WaitingPattern(BoxPattern del, float wait) {
         this.delegatePattern = del;
+        this.waitTime = wait;
     }
 
-    /// <summary>
-    /// Returns the vertical position of a given box at time t.
-    /// </summary>
-    /// <param name="boxPos">The index of the box, starting at 0</param>
-    /// <param name="time">The current time.</param>
-    /// <returns>A value from 0 to 1 indicating what percent of the maximum height the box is at.</returns>
-    public float GetPositionAtTime(int boxPos, float t) => delegatePattern.GetVerticalPosPercent(boxPos, t);
+    public float AddTimeAndGetVerticalPercent(float timeDelta) {
+        if (waitTime > 0) {
+            waitTime -= timeDelta;
+            if (waitTime > 0) {
+                return 0;
+            } else {
+                float excess = -waitTime;
+                waitTime = 0;
+                return delegatePattern.AddTimeAndGetVerticalPercent(-excess);
+            }
+        }
+        return delegatePattern.AddTimeAndGetVerticalPercent(timeDelta);
+    }
 }

@@ -59,11 +59,6 @@ public class Actor {
     // }
 
     /// <summary>
-    /// Called when the Actor is added to the Game
-    /// </summary>
-    public virtual void Added() { }
-
-    /// <summary>
     /// Checks if an animation is playing
     /// </summary>
     // public bool IsPlaying(string name)

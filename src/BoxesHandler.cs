@@ -11,9 +11,7 @@ public class BoxesHandler {
     public readonly Box?[] boxes = new Box[BOX_COUNT];
 
     private readonly ArrowGame game;
-    private readonly BoxPattern pattern;
 
-    private float boxTime = 0;
 
     public readonly int[] boxXPositions = [.. from i in Enumerable.Range(0, BOX_COUNT) select (ArrowGame.BOX_SPACING + Box.WIDTH) * i];
     private readonly float[] boxRespawnTimers = [.. from _ in Enumerable.Range(0, BOX_COUNT) select 0f];
@@ -28,16 +26,18 @@ public class BoxesHandler {
 
 
 
-    public BoxesHandler(BoxPattern pattern, ArrowGame game) {
+    public BoxesHandler(ArrowGame game) {
         this.game = game;
-        this.pattern = pattern;
 
         // Initialize boxes
         for (int i = 0; i < BOX_COUNT; i++) {
             Point2 position = ArrowGame.BoxAreaStartPoint + new Point2(boxXPositions[i], 0);
 
-            var box = game.Create<Box>(position);
-            box.boxId = i;
+            var box = new Box(getPattern(i, 0f)) {
+                Game = game,
+                Position = position,
+            };
+            game.Register(box);
             boxes[i] = box;
         }
     }
@@ -46,12 +46,14 @@ public class BoxesHandler {
         return Player.NoPlayer;
     }
 
+    private BoxPattern getPattern(int offset, float startWait) {
+        float waitTime = startWait + (0.3f * offset);
+        return new WaitingPattern(new WavePattern(), waitTime);
+    }
+
+
 
     public void Update() {
-        boxTime += game.Time.Delta;
-        if (boxTime > pattern.GetDuration()) {
-            boxTime -= pattern.GetDuration();
-        }
 
         // Respawn boxes
         for (int i = 0; i < boxRespawnTimers.Length; i++) {
@@ -63,7 +65,12 @@ public class BoxesHandler {
             if (boxRespawnTimers[i] <= 0) {
                 Point2 position = ArrowGame.BoxAreaStartPoint + new Point2(boxXPositions[i], 0);
 
-                var box = game.Create<Box>(position);
+                var box = new Box(getPattern(0, 5.0f)) {
+                    Game = game,
+                    Position = position,
+                };
+
+                game.Register(box);
                 boxes[i] = box;
             }
         }
@@ -71,9 +78,14 @@ public class BoxesHandler {
         // Destroy or move boxes
         for (int i = 0; i < boxes.Length; i++) {
             var box = boxes[i];
+
+            // Skip empty boxes
             if (box == null) {
+                Console.Write("Skipping box");
                 continue;
             }
+
+            // Destroy
             if (box.ClaimedByPlayer != Player.NoPlayer) {
                 game.Destroy(box);
                 boxes[i] = null;
@@ -86,12 +98,8 @@ public class BoxesHandler {
                 continue;
             }
 
-            float boxPercent = pattern.GetVerticalPosPercent(i, boxTime);
-
-            int boxHeight = (int)(ArrowGame.BoxArea.Height * boxPercent);
-
-            // set todo
-            boxes[i]!.Position.Y = ArrowGame.BoxArea.Bottom - boxHeight;
+            // Move
+            box.UpdatePosition(game.Time.Delta);
         }
     }
 }

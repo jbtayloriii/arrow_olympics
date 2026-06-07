@@ -15,12 +15,15 @@ public class Box : Actor {
     private bool leftHit = false;
     private bool rightHit = false;
 
+    private readonly BoxPattern pattern;
+
     private Player claimedByPlayer = Player.NoPlayer;
     public Player ClaimedByPlayer => claimedByPlayer;
 
-    public Box() {
+    public Box(BoxPattern pattern) {
         Hitbox = new(new RectInt(0, 0, WIDTH, HEIGHT));
         Mask = Masks.Box;
+        this.pattern = pattern;
     }
 
     public override void OnWasHit(Actor by) {
@@ -46,6 +49,13 @@ public class Box : Actor {
         }
 
         base.OnWasHit(by);
+    }
+
+    public void UpdatePosition(float timeDelta) {
+        float percent = pattern.AddTimeAndGetVerticalPercent(timeDelta);
+        int boxHeight = (int)(ArrowGame.BoxArea.Height * percent);
+        Position.Y = ArrowGame.BoxArea.Bottom - boxHeight;
+        Console.Write($"Moving box at percent {percent}");
     }
 
     public override void Render(Batcher batcher) {

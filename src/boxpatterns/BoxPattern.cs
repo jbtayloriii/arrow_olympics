@@ -1,13 +1,11 @@
 namespace arrow_olympics;
 
 public interface BoxPattern {
-    public float GetDuration();
 
     /// <summary>
-    /// Returns the vertical position of a given box at time t.
+    /// Adds a game time delta to the pattern and returns its vertical percent.
     /// </summary>
-    /// <param name="boxPos">The index of the box, starting at 0</param>
-    /// <param name="time">The current time.</param>
-    /// <returns>A value from 0 to 1 indicating what percent of the maximum height the box is at.</returns>
-    public float GetVerticalPosPercent(int boxPos, float t);
+    /// <param name="timeDelta"></param>
+    /// <returns>The vertical percent of the box</returns>
+    public float AddTimeAndGetVerticalPercent(float timeDelta);
 }
