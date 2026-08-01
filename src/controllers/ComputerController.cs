@@ -28,8 +28,10 @@ public class ComputerController : ShooterController {
 
     public void TargetBox() {
         int boxTarget = 2; // Testing; only target box 2 for now
-        fireDelay = BOX_TARGET_DELAY_SEC;
 
+        // Keep track of lower and upper bounds of where boxes will be
+        // We can assume that ranges aren't overlapping because boxes are the
+        // same size.
         (float, float)[] boxYPositions = new (float X, float Y)[BoxesHandler.BOX_COUNT];
 
         // Work outward in, so that overlapping boxes overwrite each other
@@ -38,7 +40,9 @@ public class ComputerController : ShooterController {
                 continue;
             }
             int nextBoxIndex = shooter.player == Player.RightPlayer ? i : BoxesHandler.BOX_COUNT - (i + 1);
-            double nextTime = fireDelay + (boxFrameLag[i] * game.Manager.UpdateMode.FixedTargetTime.TotalSeconds);
+            float arrowLag = (float)(boxFrameLag[i] * game.Manager.UpdateMode.FixedTargetTime.TotalSeconds);
+            float nextTime = BOX_TARGET_DELAY_SEC + arrowLag;
+
 
         }
 

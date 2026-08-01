@@ -16,4 +16,12 @@ public class WavePattern : BoxPattern {
         }
         return (float)((Math.Cos((timeAcc * PATTERN_SPEED) + Math.PI) + 1) / 2);
     }
+
+    public float PeekPercent(float timeDelta) {
+        float peekTimeAcc = timeAcc + timeDelta;
+        if (peekTimeAcc > PERIOD) {
+            peekTimeAcc -= PERIOD;
+        }
+        return (float)((Math.Cos((peekTimeAcc * PATTERN_SPEED) + Math.PI) + 1) / 2);
+    }
 }

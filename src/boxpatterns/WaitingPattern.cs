@@ -13,6 +13,14 @@ public class WaitingPattern : BoxPattern {
         this.waitTime = wait;
     }
 
+    public float PeekPercent(float timeDelta) {
+        if (waitTime > timeDelta) {
+            return 0;
+        }
+        float remainingTime = timeDelta - waitTime;
+        return delegatePattern.PeekPercent(remainingTime);
+    }
+
     public float AddTimeAndGetVerticalPercent(float timeDelta) {
         if (waitTime > 0) {
             waitTime -= timeDelta;

@@ -8,4 +8,6 @@ public interface BoxPattern {
     /// <param name="timeDelta"></param>
     /// <returns>The vertical percent of the box</returns>
     public float AddTimeAndGetVerticalPercent(float timeDelta);
+
+    public float PeekPercent(float timeDelta);
 }

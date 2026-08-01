@@ -58,6 +58,12 @@ public class Box : Actor {
         Console.Write($"Moving box at percent {percent}");
     }
 
+    public int PeekPositionWithTimeDelta(float timeDelta) {
+        float percent = pattern.PeekPercent(timeDelta);
+        int boxHeight = (int)(ArrowGame.BoxArea.Height * percent);
+        return ArrowGame.BoxArea.Bottom - boxHeight;
+    }
+
     public override void Render(Batcher batcher) {
         base.Render(batcher);
 
